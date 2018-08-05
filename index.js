@@ -7,7 +7,7 @@ const app = express();
 const cors = require('cors');
 const router = require('./router');
 const mongoose = require('mongoose');
-
+const path = require('path');
 
 //DB setup
 mongoose.connect('mongodb://localhost/pinterest');
@@ -22,6 +22,7 @@ app.use(cors());
 app.use(bodyParser.json({limit: "50mb"}));
 app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 app.use(fileUpload());
+app.use(express.static(path.join(__dirname, 'public')));
 
 
 //router(app) allows us to pass app into the file

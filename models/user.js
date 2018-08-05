@@ -1,11 +1,15 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt  = require('bcrypt-nodejs');
+var Post = require('./post');
+
+
 //define our model
 const userSchema = new Schema({
    email: { type: String, unique: true, lowercase: true },
-   password: String
-});
+   password: String,
+    posts: {type: Schema.Types.ObjectId,
+        ref: 'Post'}})
 
 
 //on save hook, encrypt password
@@ -13,6 +17,10 @@ const userSchema = new Schema({
 userSchema.pre('save', function(next) {
     //get access to user model
     const user = this;
+    if(!user.isModified('password')){
+        return next();
+    } // if statement allows us to save user without modifying password hash
+    //generate a salt then run callback
 
     //generate a salt then run callback
     bcrypt.genSalt(10, function(err, salt) {
