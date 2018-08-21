@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 //DB setup
-mongoose.connect('mongodb://localhost/pinterest');
+mongoose.connect('mongodb://localhost/pinterest-9');
 
 
 //app setup

@@ -2,14 +2,24 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 const bcrypt  = require('bcrypt-nodejs');
 var Post = require('./post');
-
-
 //define our model
 const userSchema = new Schema({
    email: { type: String, unique: true, lowercase: true },
    password: String,
-    posts: {type: Schema.Types.ObjectId,
-        ref: 'Post'}})
+    posts: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Post'}],
+    userLikes: [
+        {
+           post: {
+                type: Schema.Types.ObjectId,
+                ref: 'Post'
+            },
+           ownerOfPost: {type: String}
+        }   
+    ]
+    
+})
 
 
 //on save hook, encrypt password

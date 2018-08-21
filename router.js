@@ -7,11 +7,13 @@ const requireAuth = passport.authenticate('jwt', {session: false});
 const requireSignIn = passport.authenticate('local', {session: false });
 
 module.exports = function(app) {
-    app.get('/', requireAuth, function(req,res) {
-        res.send({ hi: 'there' });
-    })
+    app.get('/all-posts', AppActions.fetchAllPosts);
     app.post('/signin',requireSignIn, Authentication.signin);
     app.post('/signup', Authentication.signup);
-    //will eventually need to make this an authenticated post
-    app.post('/localupload', AppActions.saveLocalImage);
+    app.post('/localupload',requireAuth, AppActions.saveLocalImage);
+    app.get('/user/:id', requireAuth, AppActions.loadUserProfile);
+    app.get('/user-content/:id', AppActions.loadFilteredContent);
+    app.post('/like-post', requireAuth, AppActions.likePost);
+    app.post('/delete-post', requireAuth, AppActions.deletePost);
+
 }
