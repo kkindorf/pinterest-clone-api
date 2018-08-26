@@ -183,7 +183,7 @@ exports.deletePost = function(req, res, next) {
     Post.findOne({_id: postId})
     .then((post) => {
         Promise.all(post.likes).then(function(user, i){
-            User.findOne({_id: user._id})
+            User.findById({_id: user._id})
             .then((user)=> {
                 console.log(user)
                let updatedUserLikes = user.userLikes.filter(function(thePost, i) {
@@ -193,9 +193,6 @@ exports.deletePost = function(req, res, next) {
                })
                user.userLikes = updatedUserLikes;
                user.save();
-            })
-            .catch((e) => {
-                console.log(e)
             })
         })
         post.remove();
