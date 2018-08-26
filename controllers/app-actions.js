@@ -130,32 +130,33 @@ exports.likePost = function(req, res, next) {
         .populate('poster')
         .then((post) => {
             if(post.poster._id.toString() === userId) {
-                console.log('same')
                 res.send({post: post, error: 'You cannot like your own post'});
                 return;
             }
             const indexOfLikerId = post.likes.indexOf(userId);
             if(indexOfLikerId  > -1) {
-                const postLikesMinusOne = post.likes.filter(function(aPost, i) {
+                let postLikesMinusOne = post.likes.filter(function(aPost, i) {
                     if(i !== indexOfLikerId ) {
                         return aPost;
                     }
                 })
                 post.likes = postLikesMinusOne;
                 post.numLikes = postLikesMinusOne.length;
-                post.save();
+                post.save()
                 User.findById({_id: userId})
+                    .populate('userLikes.post')
                     .then((user) => {
-                        const userLikesMinusOne = user.userLikes.filter(function(thePost, i) {
-                            if(post._id.toString() !== thePost.post.toString()) {
+                        let userLikesMinusOne = user.userLikes.filter(function(thePost, i) {
+                            if(post._id.toString() !== thePost.post._id.toString()) {
                                 return thePost;
                             }
 
                         })
-                        console.log(userLikesMinusOne.length)
+
                         user.userLikes = userLikesMinusOne;
                         user.save();
                         res.send({updatedPost: post, updatedUser: user});  
+                        return;
                     })
             }
             else {
