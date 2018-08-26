@@ -1,6 +1,6 @@
 const User = require('../models/user');
 const Post = require('../models/post');
-const ROOT_URL = 'http://localhost:3090';
+const ROOT_URL = 'https://morning-beyond-12420.herokuapp.com/';
 
 const validateImageType = function(img) {
     let fileType = img.substring(img.length - 3);
