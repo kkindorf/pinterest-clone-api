@@ -180,11 +180,12 @@ exports.likePost = function(req, res, next) {
 exports.deletePost = function(req, res, next) {
     let postId = req.body.postId;
     let userId = req.body.userId;
-    Post.findById({_id: postId})
+    Post.findOne({_id: postId})
     .then((post) => {
-        Promise.all(post.likes).then(function(userId, i){
-            User.findById({_id: userId})
+        Promise.all(post.likes).then(function(user, i){
+            User.findOne({_id: user._id})
             .then((user)=> {
+                console.log(user)
                let updatedUserLikes = user.userLikes.filter(function(thePost, i) {
                    if(thePost.post.toString() !== post._id.toString()) {
                         return thePost;
@@ -193,8 +194,14 @@ exports.deletePost = function(req, res, next) {
                user.userLikes = updatedUserLikes;
                user.save();
             })
+            .catch((e) => {
+                console.log(e)
+            })
         })
         post.remove();
         res.send({data: post});
+    })
+    .catch((e) => {
+        console.log(e)
     })
 }
