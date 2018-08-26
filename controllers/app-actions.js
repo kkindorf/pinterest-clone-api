@@ -59,7 +59,7 @@ exports.saveLocalImage = function(req, res, next) {
             return;
         }
         else {
-            newFile.mv('public/uploaded-posts/'+newFile.name, function(err) {
+            newFile.mv('public/uploaded-images/'+newFile.name, function(err) {
                 if(err) {
                     console.log(err)
                 }
@@ -68,7 +68,7 @@ exports.saveLocalImage = function(req, res, next) {
                     .then((user) => {
                         let newPost = new Post({
                             poster: userId,
-                            image: ROOT_URL+'/uploaded-posts/'+newFile.name
+                            image: ROOT_URL+'/uploaded-images/'+newFile.name
                         })
                         newPost.save()
                         .then((post) => {
