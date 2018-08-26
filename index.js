@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 //DB setup
-mongoose.connect('mongodb://localhost/pinterest-11');
+mongoose.connect('mongodb://'+process.env.username+':'+process.env.password+'@ds133622.mlab.com:33622/pic-share');
 
 
 //app setup
