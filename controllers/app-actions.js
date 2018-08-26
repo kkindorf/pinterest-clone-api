@@ -182,10 +182,9 @@ exports.deletePost = function(req, res, next) {
     let userId = req.body.userId;
     Post.findOne({_id: postId})
     .then((post) => {
-        Promise.all(post.likes).then(function(user, i){
-            User.findById({_id: user._id})
+        Promise.all(post.likes).then(function(id, i){
+            User.findById({_id: id})
             .then((user)=> {
-                console.log(user)
                let updatedUserLikes = user.userLikes.filter(function(thePost, i) {
                    if(thePost.post.toString() !== post._id.toString()) {
                         return thePost;
