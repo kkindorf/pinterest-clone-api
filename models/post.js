@@ -13,6 +13,7 @@ const PostSchema = new Schema({
     numLikes: {type: Number},
     error: String
 })
+//middleware goes in the model we want to apply it to
 
 const Post = mongoose.model('Post', PostSchema);
 module.exports = Post;

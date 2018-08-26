@@ -10,11 +10,11 @@ const mongoose = require('mongoose');
 const path = require('path');
 
 //DB setup
-mongoose.connect('mongodb://localhost/pinterest-9');
+mongoose.connect('mongodb://localhost/pinterest-11');
 
 
 //app setup
-app.use(morgan('combined'));
+
 app.use(cors());
 //type: */* tells bodyParser that it will parse any body request using json
 

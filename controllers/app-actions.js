@@ -64,7 +64,6 @@ exports.saveLocalImage = function(req, res, next) {
                     console.log(err)
                 }
                 else {
-                    console.log('no errors yet')
                     User.findOne({_id: userId})
                     .then((user) => {
                         let newPost = new Post({
@@ -90,6 +89,38 @@ exports.saveLocalImage = function(req, res, next) {
         
 } 
 
+exports.saveOnlineImage = function(req, res, next) {
+    let userId = req.body.userId;
+    let imgString = req.body.imgString;
+    let validFile = validateImageType(imgString);
+    if(!validFile) {
+        res.send({data: "not  valid file type"})
+        return;
+    }
+    else {
+        User.findOne({_id: userId})
+            .then((user) => {
+                let newPost = new Post({
+                    poster: userId,
+                    image: imgString
+                })
+                newPost.save()
+                .then((post) => {
+                    res.send({data: post})
+                    user.posts.push(post._id);
+                    user.save();
+                })
+                .catch((e) => {
+                    res.status(400).json({
+                        error: "post could not be saved"
+                    })
+                })
+            })
+    }
+
+
+}
+
 
 exports.likePost = function(req, res, next) {
     let userId = req.body.userId;
@@ -98,17 +129,35 @@ exports.likePost = function(req, res, next) {
     Post.findById({_id: postId})
         .populate('poster')
         .then((post) => {
-            if(post.likes.indexOf(userId) > -1) {
-                res.send({post: post, error: 'You already like this post'});
-                return;
-            }
-            console.log(userId, post.poster._id.toString())
             if(post.poster._id.toString() === userId) {
                 console.log('same')
                 res.send({post: post, error: 'You cannot like your own post'});
                 return;
             }
-            
+            const indexOfLikerId = post.likes.indexOf(userId);
+            if(indexOfLikerId  > -1) {
+                const postLikesMinusOne = post.likes.filter(function(aPost, i) {
+                    if(i !== indexOfLikerId ) {
+                        return aPost;
+                    }
+                })
+                post.likes = postLikesMinusOne;
+                post.numLikes = postLikesMinusOne.length;
+                post.save();
+                User.findById({_id: userId})
+                    .then((user) => {
+                        const userLikesMinusOne = user.userLikes.filter(function(thePost, i) {
+                            if(post._id.toString() !== thePost.post.toString()) {
+                                return thePost;
+                            }
+
+                        })
+                        console.log(userLikesMinusOne.length)
+                        user.userLikes = userLikesMinusOne;
+                        user.save();
+                        res.send({updatedPost: post, updatedUser: user});  
+                    })
+            }
             else {
                 posterEmail = post.poster.email;
                 post.likes.push(userId);
@@ -118,7 +167,7 @@ exports.likePost = function(req, res, next) {
                 .then((user) => {
                     user.userLikes.push({post: post, ownerOfPost: posterEmail})
                     user.save();
-                    res.send({data: post})
+                    res.send({updatedPost: post, updatedUser: user})
                 })
                 
                 
@@ -130,11 +179,21 @@ exports.likePost = function(req, res, next) {
 exports.deletePost = function(req, res, next) {
     let postId = req.body.postId;
     let userId = req.body.userId;
-    console.log(postId)
-    Post.findOneAndRemove({
-        _id: postId
-    })
+    Post.findById({_id: postId})
     .then((post) => {
+        Promise.all(post.likes).then(function(userId, i){
+            User.findById({_id: userId})
+            .then((user)=> {
+               let updatedUserLikes = user.userLikes.filter(function(thePost, i) {
+                   if(thePost.post.toString() !== post._id.toString()) {
+                        return thePost;
+                   }
+               })
+               user.userLikes = updatedUserLikes;
+               user.save();
+            })
+        })
+        post.remove();
         res.send({data: post});
     })
 }

@@ -11,9 +11,9 @@ module.exports = function(app) {
     app.post('/signin',requireSignIn, Authentication.signin);
     app.post('/signup', Authentication.signup);
     app.post('/localupload',requireAuth, AppActions.saveLocalImage);
+    app.post('/online-image', requireAuth, AppActions.saveOnlineImage);
     app.get('/user/:id', requireAuth, AppActions.loadUserProfile);
     app.get('/user-content/:id', AppActions.loadFilteredContent);
     app.post('/like-post', requireAuth, AppActions.likePost);
     app.post('/delete-post', requireAuth, AppActions.deletePost);
-
 }
