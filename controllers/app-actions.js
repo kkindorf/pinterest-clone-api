@@ -181,17 +181,18 @@ exports.deletePost = function(req, res, next) {
     let postId = req.body.postId;
     let userId = req.body.userId;
     Post.findOne({_id: postId})
+    .populate('likes')
     .then((post) => {
         Promise.all(post.likes).then(function(user, i){
             User.findOne({_id: user})
-            .then((user)=> {
-               let updatedUserLikes = user.userLikes.filter(function(thePost, i) {
+            .then((aUser)=> {
+               let updatedUserLikes = aUser.userLikes.filter(function(thePost, i) {
                    if(thePost.post.toString() !== post._id.toString()) {
                         return thePost;
                    }
                })
-               user.userLikes = updatedUserLikes;
-               user.save();
+               aUser.userLikes = updatedUserLikes;
+               aUser.save();
             })
             .catch((e) => {
                 console.log(e)
